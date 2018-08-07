@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>RIT Hackathon</title>
+  <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.5.0.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+  <script src="https://cdn.pubnub.com/sdk/pubnub-angular/pubnub-angular-4.0.2.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+  <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" /> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <style>
+    .category {
+      vertical-align: middle;
+      font-size: 18px;
+      padding-left: 24px;
+    }
+
+    .material-icons {
+      vertical-align: middle;
+    }
+
+    body {
+      background: #f8f8f8
+    }
+  </style>
+</head>
+
+<body>
+  <div class="navbar-fixed">
+    <nav>
+      <div class="blue nav-wrapper">
+        <a href="#!" class="brand-logo">CANDiD</a>
+      </div>
+    </nav>
+  </div>
+  <div class="container" ng-app="PubNubAngularApp" ng-controller="MyQandACtrl">
+
+    <!-- <pre>
+NOTE: make sure to update the PubNub keys below with your keys,
+and ensure that the Q&amp;A BLOCK is configured properly!
+</pre> -->
+
+    <div class="input-field">
+        <input ng-model="toSend" type="text">
+      </div>
+    <input type="button" class="btn-flat" ng-click="publish()" value="Send!" />
+
+    <br />
+    <br />
+
+    <ul>
+      <li class="card-panel" ng-repeat="message in messages track by $index">
+        <i class="material-icons pink-text">face</i>&nbsp;{{message.text}}
+        <br><br><i class="material-icons teal-text">assistant</i> {{message.answer.replace("Wolfram Alpha","We")}}
+      </li>
+    </ul>
+
+  </div>
+
+  <script>
+    angular.module('PubNubAngularApp', ["pubnub.angular.service"])
+      .controller('MyQandACtrl', function ($rootScope, $scope, Pubnub) {
+        $scope.messages = [];
+        $scope.channel = 'wolfram-channel';
+
+        if (!$rootScope.initialized) {
+          Pubnub.init({
+            publishKey: 'pub-c-94769c17-9b6a-471d-b6a1-422d9c4d8de5',
+            subscribeKey: 'sub-c-a6a07384-90e1-11e8-94c4-4245bce006b6',
+            ssl: true
+          });
+          $rootScope.initialized = true;
+        }
+
+        var msgCallback = function (payload) {
+          $scope.$apply(function () {
+            console.log(payload.message.answer)
+            $scope.messages.unshift(payload.message);
+            // $scope.message.push(payload.message.answer);
+
+          });
+        };
+        //
+        $scope.publish = function () {
+          Pubnub.publish({
+            channel: $scope.channel,
+            message: {
+              text: $scope.toSend
+            }
+          });
+
+          $scope.toSend = "";
+        };
+
+        Pubnub.subscribe({ channels: [$scope.channel] });
+        Pubnub.addListener({ message: msgCallback });
+
+      });
+  </script>
+</body>
+
+</html>

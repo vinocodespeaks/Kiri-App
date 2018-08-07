@@ -1,0 +1,86 @@
+<html>
+
+<head>
+    <title>RIT Hackathon</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        .category {
+            vertical-align: middle;
+            font-size: 18px;
+            padding-left: 24px;
+        }
+
+        .material-icons {
+            vertical-align: middle;
+        }
+
+        body {
+            background: #f8f8f8
+        }
+
+        .video-container {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .video-container video,
+        .video-container canvas {
+            /* Make video to at least 100% wide and tall */
+            min-width: 100%;    
+            min-height: 100%;
+
+            /* Setting width & height to auto prevents the browser from stretching or squishing the video */
+            width: auto;
+            height: auto;
+
+            /* Center the video */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="blue nav-wrapper">
+                <a href="three/threejs.org/editor/index.html" class="brand-logo">CANDiD</a>
+            </div>
+        </nav>
+    </div>
+    <div>
+        <div class="video-container">
+            <video width="100%" id="preview"></video>
+        </div>
+    </div>
+    <script type="text/javascript" src="instascan.min.js"></script>
+    <script>
+        let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
+        scanner.addListener('scan', function (content) {
+            console.log(content);
+            window.location.href = "three/threejs.org/editor/index.html#file=atom.json";
+        });
+        Instascan.Camera.getCameras().then(function (cameras) {
+            if (cameras.length > 0) {
+                scanner.start(cameras[cameras.length - 1]);
+            } else {
+                console.error('No cameras found.');
+            }
+        }).catch(function (e) {
+            console.error(e);
+        });
+    </script>
+</body>
+
+</html>

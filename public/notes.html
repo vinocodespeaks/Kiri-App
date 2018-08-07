@@ -1,0 +1,106 @@
+<html>
+
+<head>
+    <title>Notes</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        .category {
+            vertical-align: middle;
+            font-size: 18px;
+            padding-left: 24px;
+        }
+
+        .material-icons {
+            vertical-align: middle;
+        }
+
+        body {
+            background: #f8f8f8
+        }
+
+         .card-panel {
+            border-color: #00bcd4;
+            border-left-style: solid;
+            border-left-width: 4px;
+        } 
+
+        .row {
+            margin: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="blue nav-wrapper">
+                <a href="#!" class="brand-logo">CANDiD</a>
+            </div>
+        </nav>
+    </div>
+    <div class="row" id="container" style="padding:24px;">
+
+    </div>
+</body>
+
+<script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
+<script>
+    // Initialize Firebase
+
+    function itemBuilder(key, data) {
+        var str = `<div class="card-panel">
+            <div class="row">
+                <div class="col s1">
+                    <a href="#"><i class="material-icons teal-text">file_copy</i></a><br><br>                    
+                    <a href="#"><i class="material-icons red-text" onclick="deleteRec('${key}')">delete</i></a>
+                </div>
+                <div class="col s10 offset-s1">${data}</div>
+            </div>
+        </div>`
+        return str;
+    }
+
+    var config = {
+        apiKey: "AIzaSyAsn0ow1cIugfZSKS4cidFokLK9eMZwduw",
+        authDomain: "rit-hackathon.firebaseapp.com",
+        databaseURL: "https://rit-hackathon.firebaseio.com",
+        projectId: "rit-hackathon",
+        storageBucket: "rit-hackathon.appspot.com",
+        messagingSenderId: "60634605932"
+    };
+    firebase.initializeApp(config);
+
+    function startup() {
+
+        firebase.database().ref('/notes/').once('value').then(snap => {
+
+            document.getElementById("container").innerHTML = "";
+
+            var data = snap.val();
+
+            for (var key in data) {
+                var rec = data[key];
+
+                document.getElementById("container").innerHTML += itemBuilder(key, rec);
+
+
+            }
+        })
+
+    }
+
+    function deleteRec(key) {
+        firebase.database().ref('/notes/' + key).set(null);
+        startup();
+    }
+
+    startup();
+
+</script>
+
+</html>
